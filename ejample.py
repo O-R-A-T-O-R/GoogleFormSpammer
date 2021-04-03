@@ -23,27 +23,3 @@ for i in range(thread_amount):
     _.append(thr)
 
 [t.join() for t in _]
-
-# GoogleFormSpammer.git
-# Production by HidBell organization
-
-# *Use python3 instead python, if you have not only Python3.*
-
-# *$ python main.py --help* <-------- to get help table
-
-# Instruction to start raiding:
-
-# *$ python main.py --link set* <------- set raid link
-# *$ python main.py --link get* <------- show raid link
-# *$ python main.py --resp set_input* <- auto set all short questions in google_form
-# *$ python main.py --resp get_unput* <- show all short questions and all choices of answer
-# *$ python main.py --_input set* <----- set all long answers of questions
-
-# Additional Instruction about *--_input set*:
-
-# name ----------- to set random name
-# surname -------- to set random surname
-# fio ------------ to set random "surname name second_name"
-# fi ------------- to set random "surname name"
-# gen ------------ to set random gender word
-# default -------- to set sentence with 100 random words
