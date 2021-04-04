@@ -4,7 +4,8 @@ headers = {
 
 default_config = {
     "LINK": "",
-    "AMOUNT": ""
+    "AMOUNT": "",
+    "THREADS": ""
 }
 
 config_name = "config.json"

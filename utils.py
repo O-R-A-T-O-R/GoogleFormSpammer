@@ -1,5 +1,7 @@
 import json, sys, requests, random
 import os.path
+import threading
+
 from bs4 import BeautifulSoup
 
 from LogPython import LogManager
@@ -39,6 +41,7 @@ holes_checker() # check titles and if it`s necessary update json (config.json)
 
 link = config_titles['LINK']
 amount = int(config_titles['AMOUNT'])
+threads = int(config_titles['THREADS'])
 
 DATA = requests.get(link).text
 
@@ -100,15 +103,18 @@ def quest_handler() -> list:
             if backup_access.upper() == "Y":
                 save_exists = True
                 
-                with open(answers_save_name, "r", encoding = "utf-8") as backup:
-                    backup_content = str()
+                try:
+                    with open(answers_save_name, "r", encoding = "utf-8") as backup:
+                        backup_content = str()
 
-                    for row in backup.readlines():
-                        backup_content += row
+                        for row in backup.readlines():
+                            backup_content += row
 
-                    answers = json.loads(backup_content)
+                        answers = json.loads(backup_content)
 
-                    break
+                        break
+                except:
+                    LogManager.error("Backup has some error and now not able to work correctly (enter answers manually)")
 
             elif backup_access.upper() == "N":
                 break
@@ -168,14 +174,32 @@ def requested_data(container : list) -> dict:
 
     return requested
 
-def launcher(data_container : dict, thread_number : int):
+def launch(data_container : dict):
+    """
 
-    for i in range(amount):
-        raid_data = requested_data(data_container) 
+    start raid to google form using quest_body (data about questions) 
+    and 
+    created with it response_data (answers on questions)
 
-        r = requests.post(link,
-                          data = raid_data,
-                          headers = headers,
-                          proxies = None)
+    """
 
-        LogManager.info(f"{r}///{thread_number + 1}///{i + 1}".rjust(35, "<"))
+    def launcher_handler(thread_number : int):
+        for i in range(amount):
+            raid_data = requested_data(data_container) 
+
+            r = requests.post(link,
+                            data = raid_data,
+                            headers = headers,
+                            proxies = None)
+
+            LogManager.info(f"{r}///{thread_number + 1}///{i + 1}".rjust(35, "<"))
+
+    _ = list()
+
+    for i in range(threads):
+        thr = threading.Thread(target = launcher_handler, args = [i], daemon = True)
+        thr.start()
+
+        _.append(thr)
+
+    [t.join() for t in _]
