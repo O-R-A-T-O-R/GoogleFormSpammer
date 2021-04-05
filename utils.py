@@ -46,7 +46,7 @@ link = config_titles['LINK']
 amount = int(config_titles['AMOUNT'])
 threads = int(config_titles['THREADS'])
 
-DATA = requests.get(link).text
+DATA = requests.get(link, headers = headers).text
 
 def answers_filler(container : list):
     for elem in container: 
@@ -91,8 +91,6 @@ def quest_handler() -> list:
     body = DATA[DATA.find("var FB_PUBLIC_LOAD_DATA_ "):]
     body = body[:body.find(',"/forms"')].lstrip("var FB_PUBLIC_LOAD_DATA_ = ").replace("null", "0") + "]"
     body = json.loads(body)
-
-    json.dump(body, open("add.json", "w", encoding = "utf-8"), ensure_ascii = False, indent = 4)
 
     for element in body[1][1]:
         temp = list()
