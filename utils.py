@@ -1,11 +1,14 @@
 import json, sys, requests, random
 import os.path
 import threading
+from faker import Faker
 
 from bs4 import BeautifulSoup
 
 from LogPython import LogManager
 from constants import default_config, config_name, answers_save_name, headers
+
+faker = Faker(['ru_RU'])
 
 def get_config_titles(filename : str) -> dict:
     config_content = str()
@@ -50,6 +53,32 @@ def answers_filler(container : list):
         if elem['value'] == "LongAnswer":
             elem['value'] = input(elem['quest'] + ": ")
 
+def keyword_value(keyword : str) -> str:
+    """
+
+    :return:
+
+    value of keyword
+
+    created to randomize long answers
+
+    """
+
+    name = faker.name().split()
+    time = str(faker.date_time_between()).split()[1].split(":")
+    time = time[0] + ":" + time[1]
+
+    keywords_values = {
+        'name' : name[0],
+        'surname' : name[1],
+        'middle_name' : name[2],
+        'full_name' : " ".join(name),
+        'date' : faker.date(),
+        'time' : time
+    }
+
+    return keywords_values[keyword]
+
 def quest_handler() -> list:
     """
 
@@ -62,6 +91,8 @@ def quest_handler() -> list:
     body = DATA[DATA.find("var FB_PUBLIC_LOAD_DATA_ "):]
     body = body[:body.find(',"/forms"')].lstrip("var FB_PUBLIC_LOAD_DATA_ = ").replace("null", "0") + "]"
     body = json.loads(body)
+
+    json.dump(body, open("add.json", "w", encoding = "utf-8"), ensure_ascii = False, indent = 4)
 
     for element in body[1][1]:
         temp = list()
@@ -144,10 +175,13 @@ def requested_data(container : list) -> dict:
     requested = dict()
     
     for elem in container:
-        if elem['value'] is list:
+        if type(elem['value']) is list:
             requested[elem['id']] = random.choice(elem['value'])
         else:
-            requested[elem['id']] = elem['value']
+            try:
+                requested[elem['id']] = keyword_value(elem['value'])
+            except KeyError:
+                requested[elem['id']] = elem['value']
 
     soup = BeautifulSoup(DATA, "lxml")
 
