@@ -10,6 +10,24 @@ from constants import default_config, config_name, answers_save_name, headers
 
 faker = Faker(['ru_RU'])
 
+def config_default():
+    with open(config_name, "w", encoding = "utf-8") as place:
+        json.dump(default_config, place, ensure_ascii = False, indent = 4)
+
+        LogManager.error("Config file is empty or unable to work correctly")
+        LogManager.warning("Forced update config.json [to default settings]")
+
+        sys.exit(0)
+
+def existing_checker(filename : str):
+    try:
+        with open(filename, "r", encoding = "utf-8") as read_stream:
+            pass
+    except FileNotFoundError:
+        config_default()
+
+existing_checker(config_name)
+
 def get_config_titles(filename : str) -> dict:
     config_content = str()
     
@@ -32,13 +50,7 @@ def holes_checker():
                 sys.exit(0)
                 
     except TypeError:
-        with open(config_name, "w", encoding = "utf-8") as place:
-            json.dump(default_config, place, ensure_ascii = False, indent = 4)
-
-            LogManager.error("Config file is empty or unable to work correctly")
-            LogManager.warning("Forced update config.json [to default settings]")
-
-            sys.exit(0)
+        config_default()
 
 holes_checker() # check titles and if it`s necessary update json (config.json)
 
@@ -74,6 +86,7 @@ def keyword_value(keyword : str) -> str:
         'middle_name' : name[2],
         'full_name' : " ".join(name),
         'date' : faker.date(),
+        'phone' : faker.phone_number(),
         'time' : time
     }
 
