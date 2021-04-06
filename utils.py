@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from LogPython import LogManager
 from constants import default_config, config_name, answers_save_name, headers
 
-faker = Faker(['ru_RU'])
+fake = Faker(['ru_RU'])
 
 def config_default():
     with open(config_name, "w", encoding = "utf-8") as place:
@@ -76,18 +76,22 @@ def keyword_value(keyword : str) -> str:
 
     """
 
-    name = faker.name().split()
-    time = str(faker.date_time_between()).split()[1].split(":")
+    name = fake.name().split()
+    time = str(fake.date_time_between()).split()[1].split(":")
     time = time[0] + ":" + time[1]
 
     keywords_values = {
-        'name' : name[0],
+        'name' : fake.first_name(),
         'surname' : name[1],
         'middle_name' : name[2],
         'full_name' : " ".join(name),
-        'date' : faker.date(),
-        'phone' : faker.phone_number(),
-        'time' : time
+        'date' : fake.date(),
+        'phone' : fake.phone_number(),
+        'time' : time,
+        'sentence_sm' : fake.sentence(random.randint(4, 12)),
+        'sentence_md' : fake.sentence(random.randint(12, 30)),
+        'sentence_lg' : fake.sentence(random.randint(30, 50)),
+        'sentence_xl' : fake.sentence(random.randint(50, 100))
     }
 
     return keywords_values[keyword]
@@ -186,11 +190,20 @@ def requested_data(container : list) -> dict:
     requested = dict()
     
     for elem in container:
-        if type(elem['value']) is list:
+        if type(elem['value']) is list: # if short question (with choices)
             requested[elem['id']] = random.choice(elem['value'])
         else:
             try:
-                requested[elem['id']] = keyword_value(elem['value'])
+                requested_ = str()
+
+                for element in elem['value'].split():
+                    try:
+                        requested_ += (keyword_value(element) + " ")
+                    except:
+                        requested_ += (element + " ")
+
+                requested[elem['id']] = requested_
+
             except KeyError:
                 requested[elem['id']] = elem['value']
 
