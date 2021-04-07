@@ -1,4 +1,4 @@
-from utils import holes_checker, quest_handler, launch
+from utils import quest_handler, launch
 
 quest_body = quest_handler() # grouping data about google form using only a link
 

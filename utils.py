@@ -1,4 +1,6 @@
 import json, sys, requests, random
+from re import X
+from os import read
 import os.path
 import threading
 from faker import Faker
@@ -6,7 +8,7 @@ from faker import Faker
 from bs4 import BeautifulSoup
 
 from LogPython import LogManager
-from constants import default_config, config_name, answers_save_name, headers
+from constants import default_config, config_name, answers_save_name, headers, pum_classes
 
 fake = Faker(['ru_RU'])
 
@@ -19,14 +21,11 @@ def config_default():
 
         sys.exit(0)
 
-def existing_checker(filename : str):
-    try:
-        with open(filename, "r", encoding = "utf-8") as read_stream:
-            pass
-    except FileNotFoundError:
-        config_default()
-
-existing_checker(config_name)
+try:
+    with open(config_name, "r", encoding = "utf-8") as read_stream:
+        pass
+except FileNotFoundError:
+    config_default()
 
 def get_config_titles(filename : str) -> dict:
     config_content = str()
@@ -42,17 +41,34 @@ def get_config_titles(filename : str) -> dict:
 
 config_titles = get_config_titles(config_name)
 
-def holes_checker():
-    try:
-        for elem in config_titles:
-            if not config_titles[elem] and elem != "SHORT" and elem != "LONG":
-                LogManager.error("Not all required data exists [config.json]")
-                sys.exit(0)
-                
-    except TypeError:
-        config_default()
+try:
+    for elem in config_titles:
+        if not config_titles[elem] and elem != "SHORT" and elem != "LONG":
+            LogManager.error("Not all required data exists [config.json]")
+            sys.exit(0)
+            
+except TypeError:
+    config_default()
 
-holes_checker() # check titles and if it`s necessary update json (config.json)
+with open(config_name, "r", encoding = "utf-8") as read_stream:
+    data = read_stream.readlines()
+    string_data = str()
+
+    for elem in data:
+        string_data += elem
+
+    json_data = json.loads(string_data)
+    handled_part = json_data['LINK']
+
+    if 'formResponse' not in handled_part:
+        add_ = handled_part.split("/")
+
+        slice_part = add_[len(add_) - 1]
+        handled_part = handled_part.replace(slice_part, "formResponse")
+    
+    json_data['LINK'] = handled_part
+
+    json.dump(json_data, open(config_name, "w", encoding = "utf-8"), ensure_ascii = False, indent = 4)
 
 link = config_titles['LINK']
 amount = int(config_titles['AMOUNT'])
@@ -88,6 +104,9 @@ def keyword_value(keyword : str) -> str:
         'date' : fake.date(),
         'phone' : fake.phone_number(),
         'time' : time,
+        'email' : fake.email(),
+        'address' : fake.address(),
+        'custom' : random.choice(pum_classes),
         'sentence_sm' : fake.sentence(random.randint(4, 12)),
         'sentence_md' : fake.sentence(random.randint(12, 30)),
         'sentence_lg' : fake.sentence(random.randint(30, 50)),
@@ -225,6 +244,13 @@ def requested_data(container : list) -> dict:
         "name" : "fbzx"
     }).attrs['value']
 
+    email = soup.find_all("input", {
+        "type" : "email"
+    })
+
+    if email:
+        requested['emailAddress'] = fake.email()
+    
     requested['fvv'] = fvv
     requested['draftResponse'] = draftResponse
     requested['pageHistory'] = pageHistory
