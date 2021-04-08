@@ -82,7 +82,7 @@ def answers_filler(container : list):
             elem['value'] = input(elem['quest'] + ": ")
 
 def keyword_value(keyword : str) -> str:
-    """w
+    """
 
     :return:
 

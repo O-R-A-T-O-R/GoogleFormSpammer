@@ -3,3 +3,4 @@ config.json
 LogPython_info.log
 answers_save.json
 proxies.json
+bad_requests_objects.json
