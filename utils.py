@@ -1,14 +1,13 @@
 import json, sys, requests, random
-from re import X
-from os import read
 import os.path
 import threading
 from faker import Faker
 
 from bs4 import BeautifulSoup
+from requests.models import encode_multipart_formdata
 
 from LogPython import LogManager
-from constants import default_config, config_name, answers_save_name, headers, pum_classes
+from constants import default_config, config_name, answers_save_name, headers, pum_classes, fails_name
 
 fake = Faker(['ru_RU'])
 
@@ -126,7 +125,13 @@ def quest_handler() -> list:
 
     body = DATA[DATA.find("var FB_PUBLIC_LOAD_DATA_ "):]
     body = body[:body.find(',"/forms"')].lstrip("var FB_PUBLIC_LOAD_DATA_ = ").replace("null", "0") + "]"
-    body = json.loads(body)
+
+    try:
+        body = json.loads(body)
+    except:
+        LogManager.info(DATA)
+        LogManager.warning("!!! FAILED IN REQUEST DATA !!!")
+        sys.exit(0)
 
     for element in body[1][1]:
         temp = list()
@@ -248,7 +253,7 @@ def requested_data(container : list) -> dict:
         "type" : "email"
     })
 
-    if email:
+    if email: # checking for email input existing (this input doesn`t show in FB_PUBLIC_LOAD_DATA_ - json with questions and answers choices)
         requested['emailAddress'] = fake.email()
     
     requested['fvv'] = fvv
@@ -277,7 +282,31 @@ def launch(data_container : dict):
                             proxies = None)
 
             LogManager.info(f"{r}///{thread_number + 1}///{i + 1}".rjust(35, "<"))
+            
+            if not os.path.exists(fails_name):
+                open(fails_name, "w", encoding = "utf-8").close()
 
+            if r.status_code == 400:
+                with open(fails_name, "r", encoding = "utf-8") as read_stream:
+                    str_data = str()
+
+                    for elem in read_stream.readlines():
+                        str_data += elem
+
+                    try:
+                        data = json.loads(str_data)
+                    except: 
+                        data = None
+
+                    data_container = list()
+
+                    if data is not None:
+                        data_container.append(data)
+
+                    data_container.append(raid_data)
+
+                    json.dump(data_container, fails_name, ensure_ascii = False, indent = 4)
+                        
     _ = list()
 
     for i in range(threads):

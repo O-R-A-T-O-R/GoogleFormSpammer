@@ -12,3 +12,4 @@ default_config = {
 
 config_name = "config.json"
 answers_save_name = "answers_save.json"
+fails_name = "bad_requests_objects.json"
