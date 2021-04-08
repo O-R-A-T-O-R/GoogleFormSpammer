@@ -4,7 +4,7 @@ import threading
 from faker import Faker
 
 from bs4 import BeautifulSoup
-from requests.models import encode_multipart_formdata
+import unicodedata
 
 from LogPython import LogManager
 from constants import default_config, config_name, answers_save_name, headers, pum_classes, fails_name
@@ -78,10 +78,11 @@ DATA = requests.get(link, headers = headers).text
 def answers_filler(container : list):
     for elem in container: 
         if elem['value'] == "LongAnswer":
+
             elem['value'] = input(elem['quest'] + ": ")
 
 def keyword_value(keyword : str) -> str:
-    """
+    """w
 
     :return:
 
@@ -282,11 +283,11 @@ def launch(data_container : dict):
                             proxies = None)
 
             LogManager.info(f"{r}///{thread_number + 1}///{i + 1}".rjust(35, "<"))
-            
-            if not os.path.exists(fails_name):
-                open(fails_name, "w", encoding = "utf-8").close()
 
             if r.status_code == 400:
+                if not os.path.exists(fails_name):
+                    open(fails_name, "w", encoding = "utf-8").close()    
+                
                 with open(fails_name, "r", encoding = "utf-8") as read_stream:
                     str_data = str()
 
@@ -298,14 +299,14 @@ def launch(data_container : dict):
                     except: 
                         data = None
 
-                    data_container = list()
+                    data_container_ = list()
 
                     if data is not None:
-                        data_container.append(data)
+                        data_container_.append(data)
 
-                    data_container.append(raid_data)
+                    data_container_.append(raid_data)
 
-                    json.dump(data_container, fails_name, ensure_ascii = False, indent = 4)
+                    json.dump(data_container_, fails_name, ensure_ascii = False, indent = 4)
                         
     _ = list()
 

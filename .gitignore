@@ -2,3 +2,4 @@ __pycache__/
 config.json
 LogPython_info.log
 answers_save.json
+proxies.json
