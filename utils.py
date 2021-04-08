@@ -78,7 +78,7 @@ DATA = requests.get(link, headers = headers).text
 def answers_filler(container : list):
     for elem in container: 
         if elem['value'] == "LongAnswer":
-            elem['value'] = input(elem['quest'] + ": ")
+            elem['value'] = input(elem['quest'].encode('latin-1', 'ignor') + ": ")
 
 def keyword_value(keyword : str) -> str:
     """
@@ -282,11 +282,11 @@ def launch(data_container : dict):
                             proxies = None)
 
             LogManager.info(f"{r}///{thread_number + 1}///{i + 1}".rjust(35, "<"))
-            
-            if not os.path.exists(fails_name):
-                open(fails_name, "w", encoding = "utf-8").close()
 
             if r.status_code == 400:
+                if not os.path.exists(fails_name):
+                    open(fails_name, "w", encoding = "utf-8").close()    
+                
                 with open(fails_name, "r", encoding = "utf-8") as read_stream:
                     str_data = str()
 
