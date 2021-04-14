@@ -107,6 +107,7 @@ def keyword_value(keyword : str) -> str:
         'email' : fake.email(),
         'address' : fake.address(),
         'custom' : random.choice(pum_classes),
+        'title' : fake.sentence(random.randint(1, 4)),
         'sentence_sm' : fake.sentence(random.randint(4, 12)),
         'sentence_md' : fake.sentence(random.randint(12, 30)),
         'sentence_lg' : fake.sentence(random.randint(30, 50)),

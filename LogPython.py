@@ -12,7 +12,7 @@ if sys.platform == "win32":
     kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
 
 FILE = open('LogPython_info.log', 'a')
-pid = str(os.getpid()).ljust(5)
+pid = str(os.getpid()).ljust(5)    
 
 RESET_COLOR = '\033[0m' 
 
