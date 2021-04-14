@@ -6,4 +6,4 @@ def deps_loader(command):
     )
 
 deps_loader("pip install --upgrade pip")
-deps_loader("pip install requests faker lxml")
+deps_loader("pip install bs4 requests faker lxml")
