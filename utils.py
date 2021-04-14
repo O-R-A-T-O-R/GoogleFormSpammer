@@ -4,7 +4,6 @@ import threading
 from faker import Faker
 
 from bs4 import BeautifulSoup
-import unicodedata
 
 from LogPython import LogManager
 from constants import default_config, config_name, answers_save_name, headers, pum_classes, fails_name
