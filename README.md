@@ -1,5 +1,5 @@
-$ python deps.py\n\n
-$ python main.py
+```$ python deps.py```
+```$ python main.py```
 
 After the first run of main.py, config.json will be created and filled with empty fields
 
