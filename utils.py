@@ -1,9 +1,24 @@
-import json, sys, requests, random
-import os.path
 import threading
-from faker import Faker
+import os.path
+import sys, os
+import json, random
 
-from bs4 import BeautifulSoup
+def deps_loader(command):
+    os.system(
+        'cd \"' + os.path.dirname(sys.executable) + '\" && ' + os.path.basename(sys.executable) + ' -m ' + command
+    )
+
+try:
+    import requests
+    from faker import Faker
+    from bs4 import BeautifulSoup
+except ImportError:
+    deps_loader("pip install --upgrade pip")
+    deps_loader("pip install bs4 requests==2.8.0 faker lxml")
+
+    import requests
+    from faker import Faker
+    from bs4 import BeautifulSoup
 
 from LogPython import LogManager
 from constants import default_config, config_name, answers_save_name, headers, pum_classes, fails_name
@@ -283,30 +298,25 @@ def launch(data_container : dict):
                             proxies = None)
 
             LogManager.info(f"{r}///{thread_number + 1}///{i + 1}".rjust(35, "<"))
+            
+            if r.status_code == 400 or r.status_code == 405:
+                file_data = str()
 
-            if r.status_code == 400:
-                if not os.path.exists(fails_name):
-                    open(fails_name, "w", encoding = "utf-8").close()    
-                
                 with open(fails_name, "r", encoding = "utf-8") as read_stream:
-                    str_data = str()
+                    for row in read_stream.readlines():
+                        file_data += row
 
-                    for elem in read_stream.readlines():
-                        str_data += elem
+                    if file_data:
+                        file_data = json.loads(file_data)
 
-                    try:
-                        data = json.loads(str_data)
-                    except: 
-                        data = None
+                    to_write = list()
 
-                    data_container_ = list()
+                    for elem in file_data:
+                        to_write.append(elem)
 
-                    if data is not None:
-                        data_container_.append(data)
+                    to_write.append(raid_data)
 
-                    data_container_.append(raid_data)
-
-                    json.dump(data_container_, fails_name, ensure_ascii = False, indent = 4)
+                json.dump(to_write, open(fails_name, "w"), ensure_ascii = False, indent = 4)
                         
     _ = list()
 
