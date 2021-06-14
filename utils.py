@@ -1,7 +1,11 @@
+########################## Если не откроется сама, вот ссылка с инструкцией:
+########################## https://radolyn.com/shared/gform_spammer/README.html
+##########################
+
 import threading
 import os.path
 import sys, os
-import json, random
+import json, random    
 
 def deps_loader(command):
     os.system(
@@ -14,20 +18,30 @@ try:
     from bs4 import BeautifulSoup
 except ImportError:
     deps_loader("pip install --upgrade pip")
-    deps_loader("pip install bs4 requests==2.8.0 faker lxml")
+    deps_loader("pip install bs4 requests==2.8.0 faker lxml webbrowser")
+    
+    import webbrowser
+    
+    webbrowser.open("https://radolyn.com/shared/gform_spammer/README.html", new = 2)
 
     import requests
     from faker import Faker
     from bs4 import BeautifulSoup
 
 from LogPython import LogManager
-from constants import default_config, config_name, answers_save_name, headers, pum_classes, fails_name
+from constants import default_config, config_name, answers_save_name, headers, pum_classes
+
+LogManager.warning("If you have a questions: https://radolyn.com/shared/gform_spammer/README.html")
 
 fake = Faker(['ru_RU'])
 
 def config_default():
     with open(config_name, "w", encoding = "utf-8") as place:
         json.dump(default_config, place, ensure_ascii = False, indent = 4)
+
+        import webbrowser
+
+        webbrowser.open("https://radolyn.com/shared/gform_spammer/README.html", new = 2)
 
         LogManager.error("Config file is empty or unable to work correctly")
         LogManager.warning("Forced update config.json [to default settings]")
@@ -299,24 +313,24 @@ def launch(data_container : dict):
 
             LogManager.info(f"{r}///{thread_number + 1}///{i + 1}".rjust(35, "<"))
             
-            if r.status_code == 400 or r.status_code == 405:
-                file_data = str()
+            # if r.status_code == 400 or r.status_code == 405:
+            #     file_data = str()
 
-                with open(fails_name, "r", encoding = "utf-8") as read_stream:
-                    for row in read_stream.readlines():
-                        file_data += row
+            #     with open(fails_name, "r", encoding = "utf-8") as read_stream:
+            #         for row in read_stream.readlines():
+            #             file_data += row
 
-                    if file_data:
-                        file_data = json.loads(file_data)
+            #         if file_data:
+            #             file_data = json.loads(file_data)
 
-                    to_write = list()
+            #         to_write = list()
 
-                    for elem in file_data:
-                        to_write.append(elem)
+            #         for elem in file_data:
+            #             to_write.append(elem)
 
-                    to_write.append(raid_data)
+            #         to_write.append(raid_data)
 
-                json.dump(to_write, open(fails_name, "w"), ensure_ascii = False, indent = 4)
+            #     json.dump(to_write, open(fails_name, "w"), ensure_ascii = False, indent = 4)
                         
     _ = list()
 

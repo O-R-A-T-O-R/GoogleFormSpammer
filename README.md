@@ -1,6 +1,8 @@
 ```$ python deps.py```
 ```$ python main.py```
 
+https://radolyn.com/shared/gform_spammer/README.html
+
 After the first run of main.py, config.json will be created and filled with empty fields
 
 config.json - 3 fields: link, threads, amount.
